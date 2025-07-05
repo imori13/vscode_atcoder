@@ -1,0 +1,23 @@
+
+version: '3.8'
+
+services:
+  atcoder:
+    build: .
+    container_name: atcoder-dev
+    volumes:
+      - type: bind
+        source: .
+        target: /workspace
+      - type: bind
+        source: ./output
+        target: /workspace/output
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      - CC=gcc
+      - CXX=g++
+      - MINGW_CC=x86_64-w64-mingw32-gcc
+      - MINGW_CXX=x86_64-w64-mingw32-g++
+    command: /bin/bash

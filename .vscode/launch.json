@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run with Docker",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_docker.js",
+            "args": [
+                "${fileBasename}"
+            ],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build with Docker"
+        }
+    ]
+}

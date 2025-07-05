@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build with Docker",
+            "command": "docker-compose",
+            "args": [
+                "exec", "-T", "atcoder",
+                "g++", "-std=c++17", "-O2", "-Wall", "-Wextra", 
+                "-I/usr/local/include", "${fileBasename}",
+                "-o", "output/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "dependsOn": "Start Docker"
+        },
+        {
+            "type": "shell",
+            "label": "Start Docker",
+            "command": "docker-compose",
+            "args": ["up", "-d"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": false,
+                "reveal": "silent",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Run with input",
+            "command": "docker-compose",
+            "args": [
+                "exec", "-T", "atcoder",
+                "bash", "-c", "./output/${fileBasenameNoExtension} < input.txt"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "dependsOn": "Build with Docker",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            }
+        }
+    ]
+}
