@@ -8,7 +8,7 @@
             "args": [
                 "exec", "-T", "atcoder",
                 "g++", "-std=c++17", "-O2", "-Wall", "-Wextra", 
-                "-I/usr/local/include", "${fileBasename}",
+                "-I/usr/local/include", "src/${fileBasename}",
                 "-o", "output/${fileBasenameNoExtension}"
             ],
             "options": {
@@ -43,7 +43,7 @@
             "command": "docker-compose",
             "args": [
                 "exec", "-T", "atcoder",
-                "bash", "-c", "./output/${fileBasenameNoExtension} < input.txt"
+                "bash", "-c", "./output/${fileBasenameNoExtension} < src/input.txt"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

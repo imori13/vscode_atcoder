@@ -19,13 +19,13 @@
 docker-compose up -d --build
 
 # 手動コンパイル（Linux）
-docker-compose exec atcoder g++ -std=c++17 -O2 -Wall -Wextra main.cpp -o output/main
+docker-compose exec atcoder g++ -std=c++17 -O2 -Wall -Wextra src/main.cpp -o output/main
 
 # 手動コンパイル（Windows with MinGW64）
-docker-compose exec atcoder x86_64-w64-mingw32-g++ -std=c++17 -O2 main.cpp -o output/main.exe
+docker-compose exec atcoder x86_64-w64-mingw32-g++ -std=c++17 -O2 src/main.cpp -o output/main.exe
 
 # 入力付きで実行
-docker-compose exec -T atcoder bash -c "./output/main < input.txt"
+docker-compose exec -T atcoder bash -c "./output/main < src/input.txt"
 
 # 環境を停止
 docker-compose down
@@ -41,13 +41,14 @@ docker-compose down
 ### 実行フロー
 1. VSCode F5 → launch.json設定をトリガー
 2. プリローンチタスク → "Build with Docker"（コンテナ実行確認、ソースコンパイル）
-3. Node.jsランチャー → run_docker.jsがinput.txtでバイナリを実行
+3. Node.jsランチャー → scripts/runner.jsがsrc/input.txtでバイナリを実行
 4. Dockerコンテナ → パイプした入力で実行可能ファイルを実行
 
 ### ファイル構成
-- **ソースファイル**: ルートディレクトリ（例：`main.cpp`, `main_ai.cpp`）
+- **ソースファイル**: `src/` ディレクトリ（例：`src/main.cpp`, `src/main_ai.cpp`）
 - **出力バイナリ**: `output/` ディレクトリ（自動作成）
-- **テスト入力**: ルートディレクトリの`input.txt`
+- **テスト入力**: `src/input.txt`
+- **スクリプト**: `scripts/` ディレクトリ（実行用スクリプト）
 - **設定**: `.vscode/` ディレクトリのtasks.jsonとlaunch.json
 
 ## 主要な統合ポイント
@@ -55,7 +56,7 @@ docker-compose down
 ### VSCodeタスク
 - **"Build with Docker"**: Docker g++を使用した現在のファイルのコンパイル
 - **"Start Docker"**: コンテナの実行確認（ビルドの依存関係）
-- **"Run with input"**: input.txtを標準入力としてコンパイル済みバイナリを実行
+- **"Run with input"**: src/input.txtを標準入力としてコンパイル済みバイナリを実行
 
 ### クロスプラットフォーム対応
 - **Linuxコンパイル**: 標準GCC（`g++`）
@@ -70,13 +71,13 @@ docker-compose down
 ## 開発パターン
 
 ### 競技プログラミングワークフロー
-1. ソースファイルを作成/編集（例：`main.cpp`）
-2. `input.txt`にテスト入力を準備
+1. ソースファイルを作成/編集（例：`src/main.cpp`）
+2. `src/input.txt`にテスト入力を準備
 3. F5を押してビルドと実行
 4. 統合ターミナルで出力を確認
 
 ### ファイル命名規則
-- ソースファイルは任意の名前（例：`main.cpp`, `main_ai.cpp`）
+- ソースファイルは任意の名前（例：`src/main.cpp`, `src/main_ai.cpp`）
 - 出力バイナリはソースファイル名ベース（拡張子なし）
 - ワークスペースを整理するため`output/`ディレクトリに配置
 
@@ -106,13 +107,13 @@ Dockerコンテナに含まれるもの：
 ### 基本的な操作
 ```
 # 新しいC++ファイルを作成して実行
-新しいファイル「problem_a.cpp」を作成し、基本的なAtCoderの入力処理を含むテンプレートを作成してください。
+新しいファイル「src/problem_a.cpp」を作成し、基本的なAtCoderの入力処理を含むテンプレートを作成してください。
 
 # 現在のファイルを実行
 現在のソースファイルをビルドして実行してください。エラーがあれば修正してください。
 
 # 入力データの更新
-input.txtの内容を以下のように更新してください：
+src/input.txtの内容を以下のように更新してください：
 [入力データ]
 ```
 
@@ -125,7 +126,7 @@ input.txtの内容を以下のように更新してください：
 現在のアルゴリズムの計算量を分析し、より効率的な実装に修正してください。
 
 # テストケースの追加
-複数のテストケースに対応するため、input.txtに追加のテストデータを含めてください。
+複数のテストケースに対応するため、src/input.txtに追加のテストデータを含めてください。
 ```
 
 ### デバッグ関連

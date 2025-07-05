@@ -4,7 +4,7 @@ const path = require('path');
 
 const sourceFile = process.argv[2] || 'main.cpp';
 const baseName = path.basename(sourceFile, '.cpp');
-const inputFile = 'input.txt';
+const inputFile = 'src/input.txt';
 
 console.log(`Running ${sourceFile} with Docker...`);
 
