@@ -56,6 +56,28 @@
                 "focus": true,
                 "panel": "shared"
             }
+        },
+        {
+            "type": "shell",
+            "label": "Lint with Core Guidelines",
+            "command": "docker-compose",
+            "args": [
+                "exec", "-T", "atcoder",
+                "g++", "-std=c++17", "-Wall", "-Wextra", "-Wpedantic", 
+                "-Wconversion", "-Wsign-conversion", "-fsyntax-only",
+                "src/${fileBasename}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": ["$gcc"]
         }
     ]
 }

@@ -1,166 +1,129 @@
 # CLAUDE.md
 
-このファイルは、Claude Code (claude.ai/code) がこのリポジトリで作業する際のガイダンスを提供します。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 開発環境の概要
+## Architecture Overview
 
-これは、AtCoder競技プログラミング専用に設計されたコンテナ化されたC++開発環境です。アーキテクチャはDockerを使用して一貫した環境を提供し、VSCodeを開発ワークフローに、Node.jsをオーケストレーションに使用します。
+This is a containerized C++ development environment specifically designed for AtCoder competitive programming. The architecture uses Docker for consistent cross-platform environments, VSCode for development workflow, and Node.js for orchestration.
 
-## 共通コマンド
+### Key Architectural Components
+- **Containerized Build System**: Docker environment with Ubuntu 22.04, GCC/G++, and MinGW64 for cross-compilation
+- **Structured Source Organization**: `src/` directory for source files, `scripts/` for utilities, `output/` for binaries
+- **VSCode Integration**: Complete build/run/debug workflow through F5 key and task system
+- **Code Quality Enforcement**: GCC compiler warnings configured for C++ Core Guidelines compliance
 
-### 主要な開発ワークフロー
-- **VSCodeでのF5キー**: input.txtを標準入力として使用した完全なビルドと実行サイクル
-- **Ctrl+Shift+P → "Tasks: Run Task" → "Build with Docker"**: ビルドのみ
-- **Ctrl+Shift+P → "Tasks: Run Task" → "Run with input"**: input.txtを使用した実行
+## Essential Commands
 
-### Dockerコマンド
+### Primary Development Workflow
+- **F5 in VSCode**: Complete build and run cycle using `src/input.txt` as stdin
+- **Ctrl+Shift+P → "Tasks: Run Task" → "Build with Docker"**: Build only
+- **Ctrl+Shift+P → "Tasks: Run Task" → "Run with input"**: Execute with input
+- **Ctrl+Shift+P → "Tasks: Run Task" → "Lint with Core Guidelines"**: Static analysis with strict compiler warnings
+
+### Docker Commands
 ```bash
-# 環境の開始/再構築
+# Start/rebuild environment
 docker-compose up -d --build
 
-# 手動コンパイル（Linux）
+# Manual compilation (Linux)
 docker-compose exec atcoder g++ -std=c++17 -O2 -Wall -Wextra src/main.cpp -o output/main
 
-# 手動コンパイル（Windows with MinGW64）
+# Manual compilation (Windows with MinGW64)  
 docker-compose exec atcoder x86_64-w64-mingw32-g++ -std=c++17 -O2 src/main.cpp -o output/main.exe
 
-# 入力付きで実行
+# Execute with input
 docker-compose exec -T atcoder bash -c "./output/main < src/input.txt"
 
-# 環境を停止
+# Code quality check
+docker-compose exec atcoder g++ -std=c++17 -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -fsyntax-only src/main.cpp
+
+# Stop environment
 docker-compose down
 ```
 
-## アーキテクチャ
+## Code Architecture
 
-### コンテナ設定
+### Container Environment
 - **Base**: Ubuntu 22.04 with GCC/G++ and MinGW64 for cross-compilation
-- **AtCoder Library**: `/usr/local/include/` とMinGWインクルードパスにプリインストール
-- **ビルドフラグ**: `-std=c++17 -O2 -Wall -Wextra -I/usr/local/include`
+- **AtCoder Library**: Pre-installed in `/usr/local/include/` and MinGW include paths
+- **Build flags**: `-std=c++17 -O2 -Wall -Wextra -I/usr/local/include`
+- **Code Quality**: Strict compiler warnings enabled (`-Wpedantic -Wconversion -Wsign-conversion`)
 
-### 実行フロー
-1. VSCode F5 → launch.json設定をトリガー
-2. プリローンチタスク → "Build with Docker"（コンテナ実行確認、ソースコンパイル）
-3. Node.jsランチャー → scripts/runner.jsがsrc/input.txtでバイナリを実行
-4. Dockerコンテナ → パイプした入力で実行可能ファイルを実行
+### Execution Flow
+1. VSCode F5 → triggers launch.json configuration
+2. Pre-launch task → "Build with Docker" (ensures container running, compiles source)
+3. Node.js launcher → scripts/runner.js executes binary with src/input.txt
+4. Docker container → runs executable with piped input
 
-### ファイル構成
-- **ソースファイル**: `src/` ディレクトリ（例：`src/main.cpp`, `src/main_ai.cpp`）
-- **出力バイナリ**: `output/` ディレクトリ（自動作成）
-- **テスト入力**: `src/input.txt`
-- **スクリプト**: `scripts/` ディレクトリ（実行用スクリプト）
-- **設定**: `.vscode/` ディレクトリのtasks.jsonとlaunch.json
+### File Organization
+- **Source files**: `src/` directory (e.g., `src/main.cpp`, `src/problem_a.cpp`)
+- **Output binaries**: `output/` directory (auto-created)
+- **Test input**: `src/input.txt`
+- **Utilities**: `scripts/` directory (execution scripts)
+- **Configuration**: `.vscode/` directory with tasks.json and launch.json
 
-## 主要な統合ポイント
+### Code Quality Standards
+- **Type Safety**: Use `static_cast<std::size_t>()` for int to size_t conversions
+- **Initialization**: Always initialize variables (`int height = 0;`)
+- **Modern C++**: Prefer `auto` for type deduction, `const` for immutable data
+- **Namespace Usage**: Use anonymous namespaces for internal types and utilities
 
-### VSCodeタスク
-- **"Build with Docker"**: Docker g++を使用した現在のファイルのコンパイル
-- **"Start Docker"**: コンテナの実行確認（ビルドの依存関係）
-- **"Run with input"**: src/input.txtを標準入力としてコンパイル済みバイナリを実行
+## Development Workflow
 
-### クロスプラットフォーム対応
-- **Linuxコンパイル**: 標準GCC（`g++`）
-- **Windowsコンパイル**: MinGW64（`x86_64-w64-mingw32-g++`）
-- **環境変数**: `CC`, `CXX`, `MINGW_CC`, `MINGW_CXX`がコンテナ内で設定済み
+### Competitive Programming Pattern
+1. Create/edit source file in `src/` (e.g., `src/main.cpp`, `src/problem_a.cpp`)
+2. Prepare test input in `src/input.txt`
+3. Press F5 to build and run with input
+4. Check output in integrated terminal
+5. Use "Lint with Core Guidelines" task for code quality verification
 
-### AtCoder Library使用方法
-- AtCoder Library関数には`#include <atcoder/all>`を使用
-- ライブラリはDockerビルド時にプリインストール
-- GCCとMinGWの両方の環境で利用可能
+### Cross-Platform Compilation
+- **Linux compilation**: Standard GCC (`g++`)
+- **Windows compilation**: MinGW64 (`x86_64-w64-mingw32-g++`)
+- **Environment variables**: `CC`, `CXX`, `MINGW_CC`, `MINGW_CXX` pre-configured in container
 
-## 開発パターン
+### AtCoder Library Integration
+- Use `#include <atcoder/all>` for AtCoder Library functions
+- Library pre-installed during Docker build
+- Available in both GCC and MinGW environments
 
-### 競技プログラミングワークフロー
-1. ソースファイルを作成/編集（例：`src/main.cpp`）
-2. `src/input.txt`にテスト入力を準備
-3. F5を押してビルドと実行
-4. 統合ターミナルで出力を確認
+### Error Handling and Debugging
+- Build errors appear in VSCode terminal with problem matching
+- Runtime errors are captured and displayed
+- Exit codes properly propagated through execution chain
+- Static analysis warnings integrated into VSCode problems panel
 
-### ファイル命名規則
-- ソースファイルは任意の名前（例：`src/main.cpp`, `src/main_ai.cpp`）
-- 出力バイナリはソースファイル名ベース（拡張子なし）
-- ワークスペースを整理するため`output/`ディレクトリに配置
+## Container Environment
 
-### エラーハンドリング
-- ビルドエラーは問題マッチングでVSCodeターミナルに表示
-- 実行時エラーはキャプチャされて表示
-- 終了コードは実行チェーンを通じて適切に伝播
+The Docker container includes:
+- Ubuntu 22.04 base image
+- GCC/G++ compiler suite with C++17 support
+- MinGW64 for Windows cross-compilation
+- AtCoder Library (ACL) pre-installed
+- Development tools (git, vim, gdb, curl)
+- Node.js runtime for orchestration scripts
 
-## コンテナ環境詳細
-
-Dockerコンテナに含まれるもの：
-- Ubuntu 22.04ベースイメージ
-- GCC/G++コンパイラスイート
-- WindowsクロスコンパイルのためのMinGW64
-- AtCoder Library（ACL）プリインストール
-- 開発ツール（git, vim, gdb, curl）
-- オーケストレーションスクリプト用Node.jsランタイム
-
-コンテナ内で設定される環境変数：
+Environment variables configured in container:
 - `CC=gcc`
-- `CXX=g++`
+- `CXX=g++` 
 - `MINGW_CC=x86_64-w64-mingw32-gcc`
 - `MINGW_CXX=x86_64-w64-mingw32-g++`
 
-## 編集用プロンプトテンプレート
+## Important Notes for Claude Code
 
-### 基本的な操作
-```
-# 新しいC++ファイルを作成して実行
-新しいファイル「src/problem_a.cpp」を作成し、基本的なAtCoderの入力処理を含むテンプレートを作成してください。
+### Code Style Requirements
+- **Always initialize variables**: Use `int height = 0;` instead of `int height;`
+- **Handle type conversions safely**: Use `static_cast<std::size_t>()` for int to size_t conversions to avoid compiler warnings
+- **Use proper compiler flags**: The environment enforces strict warnings (`-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion`)
+- **Namespace organization**: Place utility types and functions in anonymous namespaces
 
-# 現在のファイルを実行
-現在のソースファイルをビルドして実行してください。エラーがあれば修正してください。
+### VSCode Configuration Notes
+- **C++ IntelliSense is disabled** to avoid conflicts with Windows MinGW includes
+- **Code analysis relies on GCC compiler warnings** rather than clang-tidy
+- **Use the "Lint with Core Guidelines" task** for static analysis before committing code
 
-# 入力データの更新
-src/input.txtの内容を以下のように更新してください：
-[入力データ]
-```
-
-### AtCoder特有の操作
-```
-# AtCoder Libraryを使用したコードの修正
-現在のコードをAtCoder Libraryを使用するように修正してください。特に[具体的な機能]を使用してください。
-
-# 計算量の最適化
-現在のアルゴリズムの計算量を分析し、より効率的な実装に修正してください。
-
-# テストケースの追加
-複数のテストケースに対応するため、src/input.txtに追加のテストデータを含めてください。
-```
-
-### デバッグ関連
-```
-# 詳細なデバッグ出力の追加
-現在のコードにデバッグ出力を追加し、各ステップの動作を確認できるようにしてください。
-
-# エラーの解決
-コンパイルエラーまたは実行時エラーを解決してください。
-
-# 出力フォーマットの修正
-AtCoderの出力フォーマットに合わせて、現在のコードの出力を修正してください。
-```
-
-### 環境・設定関連
-```
-# VSCode設定の確認
-VSCodeの設定（tasks.json、launch.json）を確認し、問題があれば修正してください。
-
-# Docker環境の再構築
-Docker環境を再構築し、必要なライブラリが正しくインストールされていることを確認してください。
-
-# 新しいプロジェクトの作成
-新しいAtCoder問題用のプロジェクト構造を作成してください。
-```
-
-### 学習・分析関連
-```
-# コードの説明
-現在のコードの動作原理とアルゴリズムについて詳しく説明してください。
-
-# 競技プログラミングのベストプラクティス
-このコードに競技プログラミングのベストプラクティスを適用してください。
-
-# 類似問題の解法パターン
-この問題の解法パターンを説明し、類似問題にも適用できるテンプレートを提供してください。
-```
+### File Operations
+- **Always place source files in `src/`** directory
+- **Test input goes in `src/input.txt`**
+- **Binary outputs automatically placed in `output/`**
+- **Use F5 key for complete build-run cycle**

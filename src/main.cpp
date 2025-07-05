@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <array>
 
 namespace
 {
@@ -10,29 +11,29 @@ namespace
 
         vector2(int y = 0, int x = 0) : y(y), x(x) {}
 
-        vector2 operator+(const vector2 &other) const
+        auto operator+(const vector2 &other) const -> vector2
         {
-            return vector2(y + other.y, x + other.x);
+            return {y + other.y, x + other.x};
         }
 
-        vector2 &operator+=(const vector2 &other)
+        auto operator+=(const vector2 &other) -> vector2 &
         {
             y += other.y;
             x += other.x;
             return *this;
         }
 
-        bool operator==(const vector2 &other) const
+        auto operator==(const vector2 &other) const -> bool
         {
             return y == other.y && x == other.x;
         }
     };
 }
 
-int main()
+auto main() -> int
 {
     const int DIRECTIONS = 4;
-    const vector2 DIRECTION_VECTORS[DIRECTIONS] = {
+    const std::array<vector2, DIRECTIONS> DIRECTION_VECTORS = {
         vector2(-1, 0), // UP
         vector2(1, 0),  // DOWN
         vector2(0, -1), // LEFT
@@ -44,48 +45,51 @@ int main()
     const char GROUND = '.';
     const char VISIBLE = 'V';
 
-    int H, W;
-    std::cin >> H >> W;
+    int height = 0;
+    int width = 0;
+    std::cin >> height >> width;
 
-    std::vector<std::vector<char>> grid(H, std::vector<char>(W));
+    std::vector<std::vector<char>> grid(static_cast<std::size_t>(height), std::vector<char>(static_cast<std::size_t>(width)));
     std::string str;
     vector2 person_pos;
 
-    for (int y = 0; y < H; ++y)
+    for (int iy = 0; iy < height; ++iy)
     {
         std::cin >> str;
-        for (int x = 0; x < W; ++x)
+        for (int ix = 0; ix < width; ++ix)
         {
-            grid[y][x] = str[x];
-            if (str[x] == PERSON)
+            grid[static_cast<std::size_t>(iy)][static_cast<std::size_t>(ix)] = str[static_cast<std::size_t>(ix)];
+            if (str[static_cast<std::size_t>(ix)] == PERSON)
             {
-                person_pos = vector2(y, x);
+                person_pos = vector2(iy, ix);
             }
         }
     }
 
     auto is_in_bounds = [&](const vector2 &pos)
     {
-        return pos.y >= 0 && pos.y < H && pos.x >= 0 && pos.x < W;
+        return pos.y >= 0 && pos.y < height && pos.x >= 0 && pos.x < width;
     };
 
     auto is_tree = [&](const vector2 &pos)
     {
-        return grid[pos.y][pos.x] == TREE;
+        return grid[static_cast<std::size_t>(pos.y)][static_cast<std::size_t>(pos.x)] == TREE;
     };
 
-    for (int dir = 0; dir < DIRECTIONS; ++dir)
+    for (std::size_t dir = 0; dir < DIRECTIONS; ++dir)
     {
         vector2 current_pos = person_pos + DIRECTION_VECTORS[dir];
 
         while (is_in_bounds(current_pos))
         {
             if (is_tree(current_pos))
-                break;
-
-            if (grid[current_pos.y][current_pos.x] == GROUND)
             {
-                grid[current_pos.y][current_pos.x] = VISIBLE;
+                break;
+            }
+
+            if (grid[static_cast<std::size_t>(current_pos.y)][static_cast<std::size_t>(current_pos.x)] == GROUND)
+            {
+                grid[static_cast<std::size_t>(current_pos.y)][static_cast<std::size_t>(current_pos.x)] = VISIBLE;
             }
 
             current_pos += DIRECTION_VECTORS[dir];
